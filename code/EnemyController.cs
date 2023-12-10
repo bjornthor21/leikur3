@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    // Public fyrir speed, orientation, change time, og audio clips.
     public float speed;
     public bool vertical;
     public float changeTime = 3.0f;
     public AudioClip playerHitClip;
     public AudioClip botHitClip;
 
-
-
+    // partice effect
     public ParticleSystem SmokeEffect;
 
     Rigidbody2D rigidbody2D;
@@ -21,7 +21,6 @@ public class EnemyController : MonoBehaviour
 
     Animator animator;
 
-    // Start is called before the first frame update
     void Start()
     {
         rigidbody2D = GetComponent<Rigidbody2D>();
@@ -31,14 +30,16 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        //remember ! inverse the test, so if broken is true !broken will be false and return won�t be executed.
+        // athugar hvort broken er false ef svo þá hreyfist hann ekkert
         if (!broken)
         {
             return;
         }
 
+        // breytir timer
         timer -= Time.deltaTime;
-
+        
+        // ef timer er minna en 0 þá breytir hann um átt og timer er endursettur
         if (timer < 0)
         {
             direction = -direction;
@@ -48,14 +49,17 @@ public class EnemyController : MonoBehaviour
 
     void FixedUpdate()
     {
-        //remember ! inverse the test, so if broken is true !broken will be false and return won�t be executed.
+        // athugar hvort broken er false ef svo þá hreyfist hann ekkert
         if (!broken)
         {
             return;
         }
 
+        // hreyfi logic.
         Vector2 position = rigidbody2D.position;
 
+        
+        // ef hann er vertical þá fer hann upp og niður annars hægri vinstir.
         if (vertical)
         {
             position.y = position.y + Time.deltaTime * speed * direction;
@@ -74,25 +78,27 @@ public class EnemyController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
+        // athugar hvort player snertir
         RubyController player = other.gameObject.GetComponent<RubyController>();
 
+        // ef svo er þá minnkar líf players um 1 og hljóð er spilað
         if (player != null)
         {
+            // Change the player's health and play the hit sound.
             player.ChangeHealth(-1);
             player.PlaySound(playerHitClip);
-
         }
     }
 
-    //Public because we want to call it from elsewhere like the projectile script
+    // þetta er notað þegar player skýtur óvin til að hann hættir að hreyfast
     public void Fix()
     {
+        // setur broken í false
         broken = false;
         rigidbody2D.simulated = false;
-        //optional if you added the fixed animation
         animator.SetTrigger("Fixed");
 
-
+        // stoppar particle effect
         SmokeEffect.Stop();
     }
 }
